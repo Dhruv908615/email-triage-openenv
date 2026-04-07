@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "task_type": "priority_only",
     "difficulty": "easy",
     "subject": "Password reset not working",
     "body": "Hi team, I tried resetting my password three times but I am still unable to log in to my account. Please help.",
@@ -11,16 +12,7 @@
   },
   {
     "id": 2,
-    "difficulty": "easy",
-    "subject": "Need invoice copy",
-    "body": "Hello, I need a copy of my invoice for last month's purchase for reimbursement purposes.",
-    "expected_priority": "low",
-    "expected_category": "billing",
-    "expected_team": "billing",
-    "expected_reply_keywords": ["invoice", "copy", "billing"]
-  },
-  {
-    "id": 3,
+    "task_type": "routing",
     "difficulty": "medium",
     "subject": "Charged twice for one order",
     "body": "I placed one order yesterday but my card has been charged twice. Please resolve this issue as soon as possible.",
@@ -30,17 +22,8 @@
     "expected_reply_keywords": ["charged", "refund", "billing", "issue"]
   },
   {
-    "id": 4,
-    "difficulty": "medium",
-    "subject": "App crashes during checkout",
-    "body": "Every time I try to complete payment, the app crashes on the checkout page. I am using the latest version.",
-    "expected_priority": "high",
-    "expected_category": "technical",
-    "expected_team": "tech",
-    "expected_reply_keywords": ["app", "crash", "technical", "checkout"]
-  },
-  {
-    "id": 5,
+    "id": 3,
+    "task_type": "full_triage",
     "difficulty": "hard",
     "subject": "Order not delivered and no updates",
     "body": "My order was supposed to arrive four days ago and I have not received any tracking updates. This is very frustrating.",
@@ -50,7 +33,30 @@
     "expected_reply_keywords": ["order", "delivery", "tracking", "update"]
   },
   {
+    "id": 4,
+    "task_type": "priority_only",
+    "difficulty": "easy",
+    "subject": "Need invoice copy",
+    "body": "Hello, I need a copy of my invoice for last month's purchase for reimbursement purposes.",
+    "expected_priority": "low",
+    "expected_category": "billing",
+    "expected_team": "billing",
+    "expected_reply_keywords": ["invoice", "copy", "billing"]
+  },
+  {
+    "id": 5,
+    "task_type": "routing",
+    "difficulty": "medium",
+    "subject": "App crashes during checkout",
+    "body": "Every time I try to complete payment, the app crashes on the checkout page. I am using the latest version.",
+    "expected_priority": "high",
+    "expected_category": "technical",
+    "expected_team": "tech",
+    "expected_reply_keywords": ["app", "crash", "technical", "checkout"]
+  },
+  {
     "id": 6,
+    "task_type": "full_triage",
     "difficulty": "hard",
     "subject": "Account locked after suspicious login alert",
     "body": "I received a suspicious login alert and now my account is locked. I have urgent work pending and need immediate access.",

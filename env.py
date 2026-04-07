@@ -1,5 +1,4 @@
 import json
-import random
 
 from models import EmailState, AgentAction, StepResult
 from graders import grade_action
@@ -11,13 +10,15 @@ class EmailTriageEnv:
         self.tasks = self.load_tasks()
         self.current_task = None
         self.done = False
+        self.task_index = -1
 
     def load_tasks(self):
         with open(self.task_file, "r", encoding="utf-8") as file:
             return json.load(file)
 
     def reset(self):
-        self.current_task = random.choice(self.tasks)
+        self.task_index = (self.task_index + 1) % len(self.tasks)
+        self.current_task = self.tasks[self.task_index]
         self.done = False
 
         return EmailState(
@@ -37,14 +38,14 @@ class EmailTriageEnv:
     def step(self, action: AgentAction):
         if not self.current_task:
             return StepResult(
-                reward=0.0,
+                reward=0.05,
                 done=True,
                 feedback="Environment not initialized. Call reset() first."
             )
 
         if self.done:
             return StepResult(
-                reward=0.0,
+                reward=0.05,
                 done=True,
                 feedback="Episode already finished. Call reset() for a new task."
             )
@@ -55,5 +56,5 @@ class EmailTriageEnv:
         return StepResult(
             reward=reward,
             done=True,
-            feedback=feedback
+            feedback=f"task_type={self.current_task.get('task_type')}; {feedback}"
         )
