@@ -1,87 +1,60 @@
+import os
+import json
+
+from openai import OpenAI
+
 from env import EmailTriageEnv
 from models import AgentAction
 
 
-def simple_rule_based_agent(subject: str, body: str) -> AgentAction:
-    text = f"{subject} {body}".lower()
+def llm_agent(subject: str, body: str) -> AgentAction:
+    api_base_url = os.environ["API_BASE_URL"]
+    api_key = os.environ["API_KEY"]
+    model_name = os.environ.get("MODEL_NAME", "openai/gpt-4o-mini")
 
-    priority = "low"
-    category = "account"
-    team = "support"
-    response = "Thank you for contacting us. We are looking into your issue."
+    client = OpenAI(
+        base_url=api_base_url,
+        api_key=api_key,
+    )
 
-    # Priority rules
-    if (
-        "urgent" in text
-        or "immediate" in text
-        or "charged twice" in text
-        or "charged" in text
-        or "crash" in text
-        or "crashes" in text
-        or "locked" in text
-        or "as soon as possible" in text
-    ):
-        priority = "high"
-    elif (
-        "help" in text
-        or "unable" in text
-        or "not delivered" in text
-        or "tracking" in text
-    ):
-        priority = "medium"
+    prompt = f"""
+You are an email triage assistant.
 
-    # Category + team + response rules
-    # Keep the order carefully arranged
+Read the email and return ONLY valid JSON with these keys:
+priority, category, team, response
 
-    # 1. Technical issues first
-    if "crash" in text or "crashes" in text or "app" in text or "checkout" in text:
-        category = "technical"
-        team = "tech"
-        response = (
-            "Thank you for reporting the app crash during checkout. "
-            "Our technical team will investigate this checkout issue."
-        )
+Allowed values:
+- priority: low, medium, high
+- category: billing, account, technical, shipping
+- team: billing, support, tech
 
-    # 2. Account issues
-    elif "password" in text or "login" in text or "account" in text or "locked" in text:
-        category = "account"
-        team = "support"
-        response = (
-            "We understand your account issue. "
-            "Our support team will help with account access, password reset, and login recovery."
-        )
+Email Subject: {subject}
+Email Body: {body}
+""".strip()
 
-    # 3. Billing issues before shipping
-    elif "charged twice" in text or "charged" in text or "refund" in text or "payment" in text:
-        category = "billing"
-        team = "billing"
-        response = (
-            "Thank you for contacting billing support. "
-            "We will review the charged twice payment issue and help with refund resolution."
-        )
+    response = client.chat.completions.create(
+        model=model_name,
+        temperature=0,
+        messages=[
+            {
+                "role": "system",
+                "content": "Return only valid JSON. Do not add markdown or explanation."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+    )
 
-    elif "invoice" in text:
-        category = "billing"
-        team = "billing"
-        response = (
-            "Thank you for contacting billing. "
-            "We will share your invoice copy and help with your billing request."
-        )
-
-    # 4. Shipping issues after billing
-    elif "order" in text or "delivery" in text or "tracking" in text:
-        category = "shipping"
-        team = "support"
-        response = (
-            "We are sorry about the order delivery delay. "
-            "Our support team will check your tracking update and assist you."
-        )
+    content = response.choices[0].message.content.strip()
+    data = json.loads(content)
 
     return AgentAction(
-        priority=priority,
-        category=category,
-        team=team,
-        response=response
+        priority=data.get("priority"),
+        category=data.get("category"),
+        team=data.get("team"),
+        response=data.get("response"),
     )
 
 
@@ -98,7 +71,7 @@ def main():
         print(f"[STATE] Subject: {state.subject}")
         print(f"[STATE] Body: {state.body}")
 
-        action = simple_rule_based_agent(state.subject, state.body)
+        action = llm_agent(state.subject, state.body)
 
         print("[ACTION]")
         print(f"priority={action.priority}")
