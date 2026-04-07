@@ -1,0 +1,16 @@
+name: email-triage-openenv
+version: "1.0.0"
+
+description: >
+  A real-world OpenEnv environment where an agent performs email triage by
+  predicting priority, category, team routing, and generating a response.
+
+entrypoint:
+  module: app
+  app: app
+
+inference:
+  file: inference.py
+
+env:
+  port: 7860
